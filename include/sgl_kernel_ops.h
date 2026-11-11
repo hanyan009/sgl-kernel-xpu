@@ -136,6 +136,14 @@ at::Tensor h3_indexed_rms_adaln(
 void h3_indexed_gate(
     at::Tensor& out, const at::Tensor& x, const at::Tensor& gate, const at::Tensor& other, const at::Tensor& indices);
 at::Tensor h3_silu_mul(const at::Tensor& input);
+void h3_qk_norm_rope(
+    at::Tensor& q,
+    at::Tensor& k,
+    const at::Tensor& q_weight,
+    const at::Tensor& k_weight,
+    const at::Tensor& cache,
+    const at::Tensor& positions,
+    double eps);
 void rmsnorm(torch::Tensor& output, torch::Tensor& input, torch::Tensor& weight, double eps);
 void fused_add_rmsnorm(torch::Tensor input, torch::Tensor residual, torch::Tensor weight, double eps);
 void gemma_rmsnorm(torch::Tensor& output, torch::Tensor& input, torch::Tensor& weight, double eps);

@@ -40,6 +40,10 @@ TORCH_LIBRARY_FRAGMENT(sgl_kernel, m) {
   m.impl("h3_indexed_gate", torch::kXPU, &at::native::xpu::h3_indexed_gate);
   m.def("h3_silu_mul(Tensor input) -> Tensor");
   m.impl("h3_silu_mul", torch::kXPU, &at::native::xpu::h3_silu_mul);
+  m.def(
+      "h3_qk_norm_rope(Tensor(a!) q, Tensor(b!) k, Tensor q_weight, Tensor k_weight, Tensor cache, Tensor positions, "
+      "float eps) -> ()");
+  m.impl("h3_qk_norm_rope", torch::kXPU, &at::native::xpu::h3_qk_norm_rope);
 
   m.def("silu_and_mul(Tensor! out, Tensor input) -> ()");
   m.impl("silu_and_mul", torch::kXPU, &silu_and_mul);
