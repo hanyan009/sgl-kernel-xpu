@@ -36,6 +36,8 @@ TORCH_LIBRARY_FRAGMENT(sgl_kernel, m) {
   m.def(
       "h3_indexed_rms_adaln(Tensor x, Tensor weight, Tensor shift, Tensor scale, Tensor indices, float eps) -> Tensor");
   m.impl("h3_indexed_rms_adaln", torch::kXPU, &at::native::xpu::h3_indexed_rms_adaln);
+  m.def("h3_indexed_gate(Tensor(a!) out, Tensor x, Tensor gate, Tensor other, Tensor indices) -> ()");
+  m.impl("h3_indexed_gate", torch::kXPU, &at::native::xpu::h3_indexed_gate);
 
   m.def("silu_and_mul(Tensor! out, Tensor input) -> ()");
   m.impl("silu_and_mul", torch::kXPU, &silu_and_mul);
