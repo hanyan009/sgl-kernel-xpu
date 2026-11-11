@@ -66,3 +66,21 @@ def h3_indexed_gate(x, gate, other, indices, *, inplace: bool = False):
     out = x if inplace else torch.empty_like(x)
     torch.ops.sgl_kernel.h3_indexed_gate(out, x, gate, other, indices)
     return out
+
+
+def can_use_h3_silu_mul(x) -> bool:
+    return (
+        x.device.type == "xpu"
+        and x.dtype == torch.bfloat16
+        and x.ndim == 2
+        and x.is_contiguous()
+        and x.shape[0] > 0
+        and x.shape[1] % 2 == 0
+        and 0 < x.shape[1] // 2 <= 16384
+    )
+
+
+def h3_silu_mul(x):
+    if not can_use_h3_silu_mul(x):
+        raise ValueError("unsupported H3 SiLU x up shape, dtype, layout or device")
+    return torch.ops.sgl_kernel.h3_silu_mul(x)

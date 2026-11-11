@@ -3,7 +3,7 @@
 import pytest
 import torch
 import torch.nn.functional as F
-from sgl_kernel.h3_fused import h3_indexed_gate, h3_rmsnorm_indexed_adaln
+from sgl_kernel.h3_fused import h3_indexed_gate, h3_rmsnorm_indexed_adaln, h3_silu_mul
 
 
 @pytest.mark.skipif(not torch.xpu.is_available(), reason="requires Intel XPU")
@@ -41,3 +41,14 @@ def test_h3_indexed_gate_out_of_place_and_in_place():
     returned = h3_indexed_gate(in_place, gate, other, indices, inplace=True)
     assert returned.data_ptr() == in_place.data_ptr()
     torch.testing.assert_close(in_place, expected, atol=0, rtol=0)
+
+
+@pytest.mark.skipif(not torch.xpu.is_available(), reason="requires Intel XPU")
+def test_h3_silu_mul_packed_tp8_width():
+    torch.manual_seed(1110)
+    rows, hidden = 128, 1792
+    x = torch.randn(rows, 2 * hidden, device="xpu", dtype=torch.bfloat16)
+    gate, up = x.chunk(2, dim=-1)
+    expected = F.silu(gate) * up
+    actual = h3_silu_mul(x)
+    torch.testing.assert_close(actual, expected, atol=0, rtol=0)
