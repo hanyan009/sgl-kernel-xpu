@@ -10,6 +10,8 @@ from sgl_kernel.h3_fused import (
     h3_silu_mul,
 )
 
+pytestmark = pytest.mark.arch("xe20")
+
 
 @pytest.mark.skipif(not torch.xpu.is_available(), reason="requires Intel XPU")
 def test_h3_rmsnorm_indexed_adaln_real_table_stride():
@@ -87,3 +89,13 @@ def test_h3_qk_norm_rope_packed_qkv_views():
     h3_qk_norm_rope_(q, k, q_weight, k_weight, cache, positions, 1e-5)
     torch.testing.assert_close(q.float(), expected_q.float(), atol=0.03, rtol=0.01)
     torch.testing.assert_close(k.float(), expected_k.float(), atol=0.03, rtol=0.01)
+
+
+def test_h3_can_use_rejects_unsupported_inputs():
+    from sgl_kernel.h3_fused import can_use_h3_silu_mul
+
+    assert not can_use_h3_silu_mul(torch.zeros(4, 8, dtype=torch.bfloat16))
+    if torch.xpu.is_available():
+        assert not can_use_h3_silu_mul(
+            torch.zeros(4, 8, device="xpu", dtype=torch.float32)
+        )
