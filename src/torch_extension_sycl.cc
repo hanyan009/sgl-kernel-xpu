@@ -33,6 +33,11 @@ TORCH_LIBRARY_FRAGMENT(sgl_kernel, m) {
   m.def("awq_dequantize(Tensor qweight, Tensor scales, Tensor qzeros) -> Tensor");
   m.impl("awq_dequantize", torch::kXPU, &awq_dequantize);
 
+  m.def(
+      "h3_qk_norm_rope(Tensor(a!) q, Tensor(b!) k, Tensor q_weight, Tensor k_weight, Tensor cache, Tensor positions, "
+      "float eps) -> ()");
+  m.impl("h3_qk_norm_rope", torch::kXPU, &at::native::xpu::h3_qk_norm_rope);
+
   m.def("silu_and_mul(Tensor! out, Tensor input) -> ()");
   m.impl("silu_and_mul", torch::kXPU, &silu_and_mul);
 
